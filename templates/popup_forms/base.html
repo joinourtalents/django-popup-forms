@@ -1,0 +1,64 @@
+{% comment %}
+
+  Popup message form, which is rendered initially hidden, and included
+  to HTML templates to perform certain actions (send message, apply
+  to pool, etc.)
+
+  Variables::
+
+    {{ form }}        Django form instance to be rendered. Required.
+
+    {{ action }}      Action URL where form should be submitted.
+                      This variable is necessary, even if
+                      {% block form_attributes %} is redefined,
+                      in order to render a form with error correctly.
+
+{% endcomment %}
+
+{% load i18n %}
+
+
+{# POPUP LINK #}
+{% block popup_link %}
+    <a class="btn_fb_oldstyle" href="{{ action }}" id="popup_link{{ popup_id }}"
+       onclick="$('#popup_form{{ popup_id }}').fadeIn('slow'); return false;">
+       {% block popup_link_label %}POPUP{% endblock %}
+    </a>
+{% endblock popup_link %}
+
+
+{# POPUP FORM #}
+{% block popup_form %}
+<div id="popup_form{{ popup_id }}" class="popup_message"
+     {% if not form.is_bound %}style="display:none"{% endif %}>
+  <div class="popup_container">
+
+    {% block form_container %}
+      <h2 class="popup_header">{% block form_title %}TITLE GOES HERE{% endblock %}</h2>
+      <div class="popup_content form_centered">
+        {% block form_body %}
+          <form{% block form_attributes %} method="post" action="{{ action }}"{% endblock form_attributes %}>
+            {% csrf_token %}
+            {% include "forms/nonfield_errors.html" %}
+
+            {% block form_fields %}
+              {% for field in form %}
+                {% include 'forms/field.html' %}
+              {% endfor %}
+            {% endblock form_fields %}
+
+              <div class="buttons_box">
+                {% block form_buttons %}
+                  <button type="submit" class="btn_blue">{% block ok_button_text %}{% trans 'Ok' %}{% endblock %}</button>
+                  <a class="btn_gray" href="{{ request.path }}">{% trans 'Cancel' %}</a>
+                {% endblock form_buttons %}
+              </div>
+
+          </form>
+        {% endblock form_body %}
+      </div>
+    {% endblock form_container %}
+
+  </div>
+</div>
+{% endblock popup_form %}

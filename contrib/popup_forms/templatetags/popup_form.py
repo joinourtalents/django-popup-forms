@@ -10,7 +10,7 @@ register = template.Library()
 
 
 def do_popup_form(parser, token):
-    """Renders form using `parts/popup_form.html` template.
+    """Renders form using `popup_forms/base.html` template.
 
     Tries to re-populate the form with data, stored in session
     by `popup_forms.decorators.popup_form` decorator.
@@ -30,7 +30,7 @@ def do_popup_form(parser, token):
 
     try:
         contents_split = token.split_contents()
-        template_name = "'parts/popup_form.html'"
+        template_name = "'popup_forms/base.html'"
         if len(contents_split) == 4:
             tag_name, popup_id, form_class, form_action = contents_split
         else:
