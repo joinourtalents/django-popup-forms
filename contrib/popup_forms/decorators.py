@@ -1,9 +1,13 @@
-"""Custom reusable decorators"""
+"""Decorators for popup form processing views"""
 
 from functools import wraps
 from django.http import HttpResponseRedirect, Http404
 
 class PopupFormValidationError(Exception):
+    """Should be raised by view, processing PopUp form,
+    instead of re-rendering this form in template.
+
+    """
 
     def __init__(self, form):
         """Stores form instance in the exception"""
@@ -17,16 +21,25 @@ def popup_form(func):
 
     Popup forms (for sending messages, inviting to events, etc.) are
     originally rendered hidden in the template, from which they should
-    be sent. This decorator wraps a view, which should process the
-    form submission.
+    be sent. This decorator wraps a view processing submission
+    of popup form.
 
-    In case the form, processed by the view, is not valid,
+    In case form processed by the view is not valid,
     the view should raise `PopupFormValidationError` exception,
     instead of re-populating form.
 
     This decorator puts the form with errors to session, and redirects
     back to original view, from where form was submitted. Then
     popup form is re-populated, showing all errors.
+
+    .. IMPORTANT::
+        * View should not render anything (i.e. return `HttpResponse`).
+          It can only return `HttpResponseRedirect`).
+        * If form validation failed, view should raise exception,
+          passing form as only argument::
+
+              if not form.is_valid():
+                  raise PopupFormValidationError(form)
 
     """
 
