@@ -20,8 +20,7 @@
 
 {# POPUP LINK #}
 {% block popup_link %}
-    <a class="btn_fb_oldstyle" href="{{ action }}" id="popup_link{{ popup_id }}"
-       onclick="$('#popup_form{{ popup_id }}').fadeIn('slow'); return false;">
+    <a class="btn_fb_oldstyle popup_form_link" href="{{ action }}" id="popup_{{ popup_id }}">
        {% block popup_link_label %}POPUP{% endblock %}
     </a>
 {% endblock popup_link %}
@@ -29,7 +28,7 @@
 
 {# POPUP FORM #}
 {% block popup_form %}
-<div id="popup_form{{ popup_id }}" class="popup_message"
+<div id="form_popup_{{ popup_id }}" class="popup_message"
      {% if not form.is_bound %}style="display:none"{% endif %}>
   <div class="popup_container">
 
@@ -50,7 +49,7 @@
               <div class="buttons_box">
                 {% block form_buttons %}
                   <button type="submit" class="btn_blue">{% block ok_button_text %}{% trans 'Ok' %}{% endblock %}</button>
-                  <a class="btn_gray" href="{{ request.path }}">{% trans 'Cancel' %}</a>
+                  <a class="btn_gray btn_popup_close" href="{{ request.path }}">{% trans 'Cancel' %}</a>
                 {% endblock form_buttons %}
               </div>
 

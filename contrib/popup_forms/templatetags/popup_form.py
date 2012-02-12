@@ -23,11 +23,11 @@ def do_popup_form(parser, token):
                       in case of validation errors.
 
     Usage::
-    
+
         {% popup_form 'id_suffix' form_class form_action_url template %}
 
     , where::
-    
+
         :id_suffix:         Suffix to be appended to ID of form and link.
                             Should be unique within the page.
         :form_class:        Form class to be used to render the popup form.

@@ -1,0 +1,7 @@
+<html><body>
+{% load popup_form %}
+{% load url from future %}
+
+This link opens popup form:
+{% popup_form 1 popup_forms.PopupForm '/process_form/' 'popup_forms_test/form.html' %}
+</body></html>
