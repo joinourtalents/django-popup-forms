@@ -28,7 +28,7 @@
 
 {# POPUP FORM #}
 {% block popup_form %}
-<div id="form_popup_{{ popup_id }}" class="popup_message"
+<div id="form_popup_{{ popup_id }}" class="popup_box"
      {% if not form.is_bound %}style="display:none"{% endif %}>
   <div class="popup_container">
 
@@ -46,11 +46,13 @@
               {% endfor %}
             {% endblock form_fields %}
 
-              <div class="buttons_box">
-                {% block form_buttons %}
-                  <button type="submit" class="btn_blue">{% block ok_button_text %}{% trans 'Ok' %}{% endblock %}</button>
-                  <a class="btn_gray btn_popup_close" href="{{ request.path }}">{% trans 'Cancel' %}</a>
-                {% endblock form_buttons %}
+              <div class="popup_buttons_box">
+                <div class="fl_r">
+                  {% block form_buttons %}
+                    <button type="submit" class="btn_blue">{% block ok_button_text %}{% trans 'Ok' %}{% endblock %}</button>
+                    <a class="btn_gray btn_popup_close" href="{{ request.path }}">{% trans 'Cancel' %}</a>
+                  {% endblock form_buttons %}
+                </div>
               </div>
 
           </form>

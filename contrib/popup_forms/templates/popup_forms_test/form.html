@@ -9,7 +9,7 @@
 
 {# POPUP FORM #}
 {% block popup_form %}
-<div id="popup_form{{ popup_id }}" class="popup_message"
+<div id="popup_form{{ popup_id }}" class="popup_box"
      {% if not form.is_bound %}style="display:none"{% endif %}>
 
     <form method="post" action="{{ action }}">
