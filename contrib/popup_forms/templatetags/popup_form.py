@@ -10,7 +10,7 @@ register = template.Library()
 
 
 def do_popup_form(parser, token):
-    """Renders form using `popup_forms/base.html` template.
+    """Renders form, and link to display it.
 
     Tries to re-populate the form with data, stored in session
     by `popup_forms.decorators.popup_form` decorator.
@@ -21,10 +21,19 @@ def do_popup_form(parser, token):
                       `custom.decorators.popup_form` decorator,
                       which should be re-populated -- for example,
                       in case of validation errors.
-                      If defined, only one form is re-populated
-                      (with action==popup_form.action), which is
-                      not hidden. Other popup forms are not populated
-                      in this case in whole template.
+
+    Usage::
+    
+        {% popup_form 'id_suffix' form_class form_action_url template %}
+
+    , where::
+    
+        :id_suffix:         Suffix to be appended to ID of form and link.
+                            Should be unique within the page.
+        :form_class:        Form class to be used to render the popup form.
+        :form_action_url:   `action` attribute for the <form>
+        :template:          Template used to render link and form.
+                            Defaults to 'popup_forms/base.html'
 
     """
 
@@ -82,12 +91,6 @@ class PopupFormNode(template.Node):
                 form_instance = form_class(data)
                 # Try to validate form, to show errors
                 form_instance.is_valid()
-            else:
-                # If popup_form exists in session, but
-                # does not correspond to current form,
-                # the current form just not rendered,
-                # because only one popup form could be visible
-                return ''
 
         # Render popup form, using template
         tpl = template.loader.get_template(template_name)
