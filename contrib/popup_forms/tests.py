@@ -55,7 +55,6 @@ class TestPopupForm(test.TestCase):
     def test_render_form(self):
         """Form should be rendered by `popup_form` template tag"""
         response = self.client.get('/render_form/')
-        print response
         self.assertContains(response, '<form method="post" action="/process_form/">')
         self.assertContains(response, '<a href="/process_form/" id="popup_link1"')
         self.assertContains(response, 'style="display:none"')
@@ -71,7 +70,6 @@ class TestPopupForm(test.TestCase):
                     data={'name': 'David', 'email': 'avsd05@gmail.com'},
                     HTTP_REFERER='/render_form/', follow=True)
         self.assertRedirects(response, '/success/')
-        print response
         self.assertContains(response, 'David, avsd05@gmail.com')
 
     def test_error_in_form(self):
