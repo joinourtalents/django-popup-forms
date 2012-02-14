@@ -19,4 +19,4 @@ def popup_forms(request):
         except AttributeError:
             raise ImproperlyConfigured('Module "{0}" does not define'
                     ' a "{1}" form class'.format(module_name, form_name))
-    return {'popup_forms': popup_forms, 'all_forms': 'FMS: '}
+    return {'popup_forms': popup_forms}
