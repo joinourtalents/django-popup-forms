@@ -18,5 +18,5 @@ def popup_forms(request):
             popup_forms[form_name] = getattr(mod, form_name)
         except AttributeError:
             raise ImproperlyConfigured('Module "{0}" does not define'
-                    ' a "{1}" form class' % (module_name, form_name))
-    return {'popup_forms': popup_forms}
+                    ' a "{1}" form class'.format(module_name, form_name))
+    return {'popup_forms': popup_forms, 'all_forms': 'FMS: '}
