@@ -73,19 +73,17 @@ def popup_form_handler(func):
     return wrapper
 
 
-def show_popup_form(action, check_function=None, get_data_function=None):
+def show_popup_form(action, check_function=None):
     """Explicitly shows popup when rendering template in decorated view.
+
+    Works only in case no popup form is defined to be shown
+    (i.e. there is no request.session['popup_form']).
 
     :action: Action URL for which popup should be made visible
 
     :check_function: Callable, returning boolean value, to determine
     whether popup should be shown or not. If `None`, the popup
     is shown implicitly. Should have the same signature as
-    decorated view function: ``func(request, *args, **kwargs)``
-
-    :get_data_function: Callable, returning form data to be used
-    to populate the popup form with. If `None`, an unbound
-    form is shown. Should have the same signature as
     decorated view function: ``func(request, *args, **kwargs)``
 
     """
@@ -95,11 +93,7 @@ def show_popup_form(action, check_function=None, get_data_function=None):
             if ('popup_form' not in request.session
                and (not check_function
                     or check_function(request, *args, **kwargs))):
-                request.session['popup_form'] = (
-                        action,
-                        None if get_data_function is None
-                            else get_data_function(request, *args, **kwargs),
-                        None)
+                request.session['popup_form'] = (action, None, None)
             return func(request, *args, **kwargs)
         return wrapper
     return make_wrapper
