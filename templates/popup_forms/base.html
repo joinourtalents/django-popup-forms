@@ -28,8 +28,9 @@
 
 {# POPUP FORM #}
 {% block popup_form %}
-<div id="form_popup_{{ popup_id }}" class="popup_box"
-     {% if not form.is_bound %}style="display:none"{% endif %}>
+<div id="form_popup_{{ popup_id }}"
+     class="{% block popup_form_class %}popup_box{% endblock %}"
+     {% if hide_popup_form %}style="display:none"{% endif %}>
   <div class="popup_container">
 
     {% block form_container %}

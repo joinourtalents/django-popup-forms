@@ -3,6 +3,7 @@
 from functools import wraps
 from django.http import HttpResponseRedirect, Http404
 
+
 class PopupFormValidationError(Exception):
     """Should be raised by view, processing PopUp form,
     instead of re-rendering this form in template.
@@ -16,8 +17,10 @@ class PopupFormValidationError(Exception):
                 u'Errors in form: {0}'.format(form.errors))
 
 
-def popup_form(func):
-    """Re-populate submitted popup form with error on referrer's page.
+def popup_form_handler(func):
+    """Decorator for popup form handling view.
+
+    Re-populate submitted popup form with error on referrer's page.
 
     Popup forms (for sending messages, inviting to events, etc.) are
     originally rendered hidden in the template, from which they should
@@ -55,7 +58,7 @@ def popup_form(func):
         try:
             response = func(request, *args, **kwargs)
         except PopupFormValidationError, e:
-            request.session['popup_form'] = request.path, e.form.data
+            request.session['popup_form'] = request.path, e.form.data, e.form.errors
             return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
         if isinstance(response, HttpResponseRedirect):
@@ -70,3 +73,33 @@ def popup_form(func):
     return wrapper
 
 
+def show_popup_form(action, check_function=None, get_data_function=None):
+    """Explicitly shows popup when rendering template in decorated view.
+
+    :action: Action URL for which popup should be made visible
+
+    :check_function: Callable, returning boolean value, to determine
+    whether popup should be shown or not. If `None`, the popup
+    is shown implicitly. Should have the same signature as
+    decorated view function: ``func(request, *args, **kwargs)``
+
+    :get_data_function: Callable, returning form data to be used
+    to populate the popup form with. If `None`, an unbound
+    form is shown. Should have the same signature as
+    decorated view function: ``func(request, *args, **kwargs)``
+
+    """
+    def make_wrapper(func):
+        @wraps(func)
+        def wrapper(request, *args, **kwargs):
+            if ('popup_form' not in request.session
+               and (not check_function
+                    or check_function(request, *args, **kwargs))):
+                request.session['popup_form'] = (
+                        action,
+                        None if get_data_function is None
+                            else get_data_function(request, *args, **kwargs),
+                        None)
+            return func(request, *args, **kwargs)
+        return wrapper
+    return make_wrapper

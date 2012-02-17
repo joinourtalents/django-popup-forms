@@ -17,10 +17,21 @@ def do_popup_form(parser, token):
 
     Session keys::
 
-      popup_form      Popup form instance, put by the
-                      `custom.decorators.popup_form` decorator,
-                      which should be re-populated -- for example,
-                      in case of validation errors.
+      popup_form      Tuple: (action, data, errors), put by the
+                      `custom.decorators.popup_form`, to
+                      re-populate form. First popup_form,
+                      matching the specified action url,
+                      is re-populated with data, and made
+                      visible.
+
+      popup_form[0]   Action url for the form to be re-populated
+
+      popup_form[1]   Form data dictionary, used to create
+                      the bound form instance. In case it's
+                      `None`, unbound form instance is created.
+
+      popup_form[2]   Form errors to be assigned to created
+                      form instance.
 
     Usage::
 
@@ -33,34 +44,40 @@ def do_popup_form(parser, token):
         :form_class:        Form class to be used to render the popup form.
         :form_action_url:   `action` attribute for the <form>
         :template:          Template used to render link and form.
-                            Defaults to 'popup_forms/base.html'
+        :instance:          For ModelForms only -- primary key or instance
+                            of the model to be used to create the form.
 
     """
 
     try:
         contents_split = token.split_contents()
-        template_name = "'popup_forms/base.html'"
-        if len(contents_split) == 4:
-            tag_name, popup_id, form_class, form_action = contents_split
-        else:
+        instance = None
+        if len(contents_split) == 5:
             (tag_name, popup_id, form_class,
              form_action, template_name) = contents_split
+        else:
+            (tag_name, popup_id, form_class,
+             form_action, template_name, instance) = contents_split
     except ValueError:
         raise template.TemplateSyntaxError('{0} tag requires '
-                'at least three arguments: '
-                'popup_id, form_class and action'
+                'at least four arguments: '
+                '"popup_id", "form_class", "action" and "template". '
+                'Fifth argument "instance" is optional.'
                 .format(token.contents.split()[0]))
-    return PopupFormNode(popup_id, form_class, form_action, template_name)
+    return PopupFormNode(popup_id, form_class,
+                         form_action, template_name, instance)
 
 register.tag('popup_form', do_popup_form)
 
 
 class PopupFormNode(template.Node):
-    def __init__(self, popup_id, form_class, form_action, template_name):
+    def __init__(self, popup_id, form_class, form_action,
+                 template_name, instance):
         self.popup_id = template.Variable(popup_id)
         self.form_class = template.Variable(form_class)
         self.form_action = template.Variable(form_action)
         self.template_name = template.Variable(template_name)
+        self.instance = template.Variable(instance) if instance else None
 
     def render(self, context):
 
@@ -69,6 +86,7 @@ class PopupFormNode(template.Node):
         form_class = self.form_class.resolve(context)
         form_action = self.form_action.resolve(context)
         template_name = self.template_name.resolve(context)
+        instance = self.instance.resolve(context) if self.instance else None
 
         # Django tries to call callables, so we extract
         # form class from the form instance
@@ -80,23 +98,42 @@ class PopupFormNode(template.Node):
 
         # Try to get popup_form from session
         # (emulate response to POST request for popup form)
+        hide_form = True  # Hide form by default, unless form is in session
         request = context['request']
         if 'popup_form' in request.session:
-            action, data = request.session['popup_form']
+            action, data, errors = request.session['popup_form']
 
             # A page could have many popup forms,
             # with different actions
             if action == form_action:
                 del request.session['popup_form']
-                form_instance = form_class(data)
-                # Try to validate form, to show errors
-                form_instance.is_valid()
+
+                # Instantiate the form
+                args, kwargs = [], {}
+                if data is not None:
+                    args.append(data)
+                if (instance is not None and hasattr(form_class, '_meta')
+                        and hasattr (form_class._meta, 'model')):
+                    # For model form - try to find the instance
+                    model_class = form_class._meta.model
+                    if not isinstance(instance, model_class):
+                        instance = model_class.objects.get(pk=instance)
+                    kwargs['instance'] = instance
+                form_instance = form_class(*args, **kwargs)
+
+                # If there are errors, show them
+                if errors:
+                    form_instance._errors = errors
+
+                # Mark the form as non-hidden
+                hide_form = False
 
         # Render popup form, using template
         tpl = template.loader.get_template(template_name)
         context_vars = {'popup_id': popup_id,
                         'form': form_instance,
-                        'action': form_action}
+                        'action': form_action,
+                        'hide_popup_form': hide_form}
         context = copy(context)
         context.update(context_vars)
         return tpl.render(RequestContext(request, context))

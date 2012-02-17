@@ -3,7 +3,7 @@
 from django import test, forms
 from django.conf.urls import patterns, url
 from django.http import HttpResponse
-from popup_forms.decorators import popup_form, PopupFormValidationError
+from popup_forms.decorators import popup_form_handler, PopupFormValidationError
 from django.shortcuts import render, redirect
 from django.test.utils import override_settings
 
@@ -24,7 +24,7 @@ def render_form(request):
     return render(request, 'popup_forms_test/page.html')
 
 
-@popup_form
+@popup_form_handler
 def process_form(request):
     if request.method == 'POST':
         form = PopupForm(request.POST)
