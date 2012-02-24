@@ -2,9 +2,6 @@ import re
 from copy import copy
 
 from django import template
-
-from candidate.models import CandidateProfile
-from recruiter.models import CompanyProfile
 from django.template.context import RequestContext
 
 register = template.Library()
@@ -131,7 +128,6 @@ def do_popup_form(parser, token):
     Usage::
 
         {% popup_form 'id_suffix' form_class form_action template %}
-        {% popup_form 'id_suffix' form_class form_action template instance %}
         {% popup_form id_suffix=... form_class=... form_action=... template=... instance=... %}
         {% popup_form 'id_suffix' form_class form_action template kwarg1=... kwarg2=... %}
 
@@ -142,8 +138,6 @@ def do_popup_form(parser, token):
         :form_class:        Form class to be used to render the popup form.
         :form_action:       `action` attribute for the <form>
         :template:          Template used to render link and form.
-        :instance:          For ModelForms only -- primary key or instance
-                            of the model to be used to create the form.
         :kwargs:            Optionally, any number of keyword arguments could be used,
                             that are passed to form constructor as **kwargs
 
@@ -156,36 +150,29 @@ def do_popup_form(parser, token):
         form_action = extractor.pop('form_action')
         template_name = extractor.pop('template')
 
-        instance = None
-        if extractor.has_more():
-            instance = extractor.pop('instance')
-        contents_split = token.split_contents()
-
     except ValueError:
         raise template.TemplateSyntaxError('{0} tag requires '
                 'at least four arguments: '
                 '"popup_id", "form_class", "action" and "template". '
-                'Fifth argument "instance" is optional.'
                 .format(token.contents.split()[0]))
     return PopupFormNode(popup_id, form_class,
                          form_action, template_name,
-                         instance, **extractor.kwargs())
+                         **extractor.kwargs())
 
 register.tag('popup_form', do_popup_form)
 
 
 class PopupFormNode(template.Node):
     def __init__(self, popup_id, form_class, form_action,
-                 template_name, instance, **kwargs):
+                 template_name, **kwargs):
         self.popup_id = template.Variable(popup_id)
         self.form_class = template.Variable(form_class)
         self.form_action = template.Variable(form_action)
         self.template_name = template.Variable(template_name)
-        self.instance = template.Variable(instance) if instance else None
 
         # Store kwargs
         self.kwargs = {}
-        for key, value in self.kwargs.iteritems():
+        for key, value in kwargs.iteritems():
             self.kwargs[key] = template.Variable(value)
 
     def render(self, context):
@@ -195,7 +182,6 @@ class PopupFormNode(template.Node):
         form_class = self.form_class.resolve(context)
         form_action = self.form_action.resolve(context)
         template_name = self.template_name.resolve(context)
-        instance = self.instance.resolve(context) if self.instance else None
 
         # Resolve kwargs
         kwargs = {}
@@ -224,13 +210,6 @@ class PopupFormNode(template.Node):
                 args = []
                 if data is not None:
                     args.append(data)
-                if (instance is not None and hasattr(form_class, '_meta')
-                        and hasattr (form_class._meta, 'model')):
-                    # For model form - try to find the instance
-                    model_class = form_class._meta.model
-                    if not isinstance(instance, model_class):
-                        instance = model_class.objects.get(pk=instance)
-                    kwargs['instance'] = instance
                 form_instance = form_class(*args, **kwargs)
 
                 # If there are errors, show them
