@@ -65,6 +65,10 @@ class TestPopupForm(test.TestCase):
         self.assertContains(response, '<input id="id_email" type="text" '
                             'name="email" maxlength="20" />')
 
+    @skip('TODO: Write test!')
+    def test_render_form_kwargs(self):
+        """Extra Keyword arguments should be passed to form when instantiating it"""
+        pass
 
     def test_submit_form(self):
         """Form processing view should redirect to success page after submit"""
@@ -89,6 +93,6 @@ class TestPopupForm(test.TestCase):
 
 
 @skip('TODO: Write test!')
-class TestTokenVarExtractor(TestCase):
+class TestTokenVarExtractor(test.TestCase):
     """Unittest for TokenVarExtractor """
     pass
