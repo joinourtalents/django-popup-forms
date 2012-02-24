@@ -1,5 +1,7 @@
 """Unittests for Popup Forms functionality"""
 
+from unittest import skip
+
 from django import test, forms
 from django.conf.urls import patterns, url
 from django.http import HttpResponse
@@ -84,3 +86,9 @@ class TestPopupForm(test.TestCase):
                             'name="name" value="David" maxlength="10" />')
         self.assertContains(response, '<input id="id_email" type="text" '
                             'name="email" value="wrongemail" maxlength="20" />')
+
+
+@skip('TODO: Write test!')
+class TestTokenVarExtractor(TestCase):
+    """Unittest for TokenVarExtractor """
+    pass
