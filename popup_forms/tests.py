@@ -3,12 +3,19 @@
 from unittest import skip
 
 from django import test, forms
-from django.conf.urls import patterns, url
+from django.conf.urls.defaults import patterns, url
 from django.http import HttpResponse
 from popup_forms.decorators import popup_form_handler, PopupFormValidationError
 from django.shortcuts import render, redirect
-from django.test.utils import override_settings
 
+try:
+    from django.test.utils import override_settings
+except ImportError:
+    from django.conf import settings
+    def override_settings(**kwargs):
+        for key, value in kwargs.iteritems():
+            setattr(settings, key, value)
+        return lambda fn: fn
 
 class PopupForm(forms.Form):
     name = forms.CharField(max_length=10)
