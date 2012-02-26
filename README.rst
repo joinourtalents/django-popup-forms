@@ -6,19 +6,19 @@ Problem
 -------
 
 * To have easy way to show popup window, holding any form,
-    from any page of the website (examples: send message from user
-    profile or from list of profiles; apply/withdraw to pool from
-    list of companies, etc.)
+  from any page of the website (examples: send message from user
+  profile or from list of profiles; apply/withdraw to pool from
+  list of companies, etc.)
 
 * This popup window should be pre-loaded, i.e. there should not
-    be HTTP request to server in order to open popup window
+  be HTTP request to server in order to open popup window
 
 * In case form error occurs (some fields are missing,
-    email format is wrong, etc.) the same form should be re-populated
-    in the same page, indicating errors
+  email format is wrong, etc.) the same form should be re-populated
+  in the same page, indicating errors
 
 * After form is submitted, user should be redirected
-    to either the same, or specified page
+  to either the same, or specified page
 
 Solution
 --------
@@ -31,7 +31,7 @@ The solution consists of 4 components:
       {% popup_form 1 popup_forms.SomeModelForm '/talent/apply/6/' 'popup_forms/apply_to_pool.html' kwarg1=... kwarg2=... %}
 
 * Decorator for view function, that is processing popup form submission,
-    and exception to handle form errors::
+  and exception to handle form errors::
 
       @popup_form
       def form_view(request):
@@ -45,7 +45,7 @@ The solution consists of 4 components:
 
 * Template to render the form, derived from popup_forms/base.html
 * (optional) context processor (popup_forms.context_processors.popup_forms),
-    that puts all PopUp form classes to context, in order not to pass it each time in view:
+  that puts all PopUp form classes to context, in order not to pass it each time in view:
 
     - in settings::
 
@@ -58,7 +58,7 @@ The solution consists of 4 components:
         {{ popup_forms.WriteMessageForm }}, etc. 
 
 * Decorator to conditionally display popup form on page load
-    (for example, to fill in some missing information after registration/login)::
+  (for example, to fill in some missing information after registration/login)::
 
       @show_popup_form('/account/register/details/',
                        lambda request: 'register-details' in request.session)
