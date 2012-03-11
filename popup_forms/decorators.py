@@ -1,7 +1,9 @@
 """Decorators for popup form processing views"""
 
 from functools import wraps
+
 from django.http import HttpResponseRedirect, Http404
+from django.core.urlresolvers import reverse_lazy
 
 
 class PopupFormValidationError(Exception):
@@ -13,7 +15,7 @@ class PopupFormValidationError(Exception):
     def __init__(self, form):
         """Stores form instance in the exception"""
         self.form = form
-        return super(PopupFormValidationError, self).__init__(
+        super(PopupFormValidationError, self).__init__(
                 u'Errors in form: {0}'.format(form.errors))
 
 
@@ -97,3 +99,13 @@ def show_popup_form(action, check_function=None):
             return func(request, *args, **kwargs)
         return wrapper
     return make_wrapper
+
+
+def popup_if_session_var(action_view_name, session_key):
+    """Shows popup form for specified view, if the key found in session."""
+    # See `popup_forms.decorators.show_popup_form` decorator for more info.
+    def _check_function(request):
+        return (request.user.is_authenticated()
+                and session_key in request.GET   # for testing purposes
+                or session_key in request.session)
+    return show_popup_form(reverse_lazy(action_view_name), _check_function)
