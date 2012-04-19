@@ -5,8 +5,10 @@ from unittest import skip
 from django import test, forms
 from django.conf.urls.defaults import patterns, url
 from django.http import HttpResponse
-from popup_forms.decorators import popup_form_handler, PopupFormValidationError
 from django.shortcuts import render, redirect
+
+import popup_forms
+from django.core.urlresolvers import reverse
 
 try:
     from django.test.utils import override_settings
@@ -33,15 +35,15 @@ def render_form(request):
     return render(request, 'popup_forms_test/page.html')
 
 
-@popup_form_handler
+@popup_forms.handler
 def process_form(request):
     if request.method == 'POST':
         form = PopupForm(request.POST)
         if not form.is_valid():
-            raise PopupFormValidationError(form)
+            return popup_forms.OpenResponse(request, form)
         request.session['stored_data'] = form.save()
-        return redirect('success')
-    return redirect('render_form')
+        return popup_forms.CloseResponse(request, reverse('success'))
+    return popup_forms.CloseResponse(request)
 
 
 def success(request):
@@ -65,7 +67,7 @@ class TestPopupForm(test.TestCase):
         """Form should be rendered by `popup_form` template tag"""
         response = self.client.get('/render_form/')
         self.assertContains(response, '<form method="post" action="/process_form/">')
-        self.assertContains(response, '<a href="/process_form/" id="popup_link1"')
+        self.assertContains(response, '<a href="/process_form/" id="popup_link_1"')
         self.assertContains(response, 'style="display:none"')
         self.assertContains(response, '<input id="id_name" type="text" '
                             'name="name" maxlength="10" />')

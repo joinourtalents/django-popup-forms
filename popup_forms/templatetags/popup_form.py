@@ -221,10 +221,10 @@ class PopupFormNode(template.Node):
 
         # Render popup form, using template
         tpl = template.loader.get_template(template_name)
-        context_vars = {'popup_id': popup_id,
-                        'form': form_instance,
-                        'action': form_action,
-                        'hide_popup_form': hide_form}
+        context_vars = {'POPUP_FORM_id': popup_id,
+                        'POPUP_FORM_form': form_instance,
+                        'POPUP_FORM_action': form_action,
+                        'POPUP_FORM_hide': hide_form}
         context = copy(context)
         context.update(context_vars)
         return tpl.render(RequestContext(request, context))

@@ -1,25 +1,10 @@
 """Decorators for popup form processing views"""
 
 from functools import wraps
-
-from django.http import HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse_lazy
+from django.http import Http404, HttpResponseRedirect
 
 
-class PopupFormValidationError(Exception):
-    """Should be raised by view, processing PopUp form,
-    instead of re-rendering this form in template.
-
-    """
-
-    def __init__(self, form):
-        """Stores form instance in the exception"""
-        self.form = form
-        super(PopupFormValidationError, self).__init__(
-                u'Errors in form: {0}'.format(form.errors))
-
-
-def popup_form_handler(func):
+def handler(func):
     """Decorator for popup form handling view.
 
     Re-populate submitted popup form with error on referrer's page.
@@ -29,22 +14,29 @@ def popup_form_handler(func):
     be sent. This decorator wraps a view processing submission
     of popup form.
 
-    In case form processed by the view is not valid,
-    the view should raise `PopupFormValidationError` exception,
-    instead of re-populating form.
+    The popup handling view should return one of following objects::
+    
+      * popup_forms.CloseResponse
+      * popup_forms.OpenResponse
 
-    This decorator puts the form with errors to session, and redirects
+    In case of returning `CloseResponse` the browser is redirected by
+    default to the same page, without populating form. In case of returning
+    `OpenResponse` browser by default is redirected to the same page,
+    and the form is re-populated. This decorator puts the form with
+    errors to session, and redirects
     back to original view, from where form was submitted. Then
     popup form is re-populated, showing all errors.
 
+    Both `OpenForm` and `CloseForm` have optional `redirect_to`
+    argument, specifying the URL to redirect instead of default one.
+
     .. IMPORTANT::
         * View should not render anything (i.e. return `HttpResponse`).
-          It can only return `HttpResponseRedirect`).
-        * If form validation failed, view should raise exception,
-          passing form as only argument::
+        * If form validation failed, view should return
+          `OpenResponse` passing form as only argument::
 
               if not form.is_valid():
-                  raise PopupFormValidationError(form)
+                  return OpenResponse(form)
 
     """
 
@@ -57,11 +49,7 @@ def popup_form_handler(func):
 
         # Try processing form. If form contains errors,
         # put it to session and redirect back to referrer.
-        try:
-            response = func(request, *args, **kwargs)
-        except PopupFormValidationError, e:
-            request.session['popup_form'] = request.path, e.form.data, e.form.errors
-            return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        response = func(request, *args, **kwargs)
 
         if isinstance(response, HttpResponseRedirect):
             return response
@@ -101,11 +89,11 @@ def show_popup_form(action, check_function=None):
     return make_wrapper
 
 
-def popup_if_session_var(action_view_name, session_key):
+def popup_if_session_var(action, session_key):
     """Shows popup form for specified view, if the key found in session."""
     # See `popup_forms.decorators.show_popup_form` decorator for more info.
     def _check_function(request):
         return (request.user.is_authenticated()
                 and session_key in request.GET   # for testing purposes
                 or session_key in request.session)
-    return show_popup_form(reverse_lazy(action_view_name), _check_function)
+    return show_popup_form(action, _check_function)

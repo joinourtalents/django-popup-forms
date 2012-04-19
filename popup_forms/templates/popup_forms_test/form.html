@@ -1,23 +1,9 @@
-{# POPUP LINK #}
-{% block popup_link %}
-    <a href="{{ action }}" id="popup_link{{ popup_id }}"
-       onclick="$('#popup_form{{ popup_id }}').fadeIn('slow'); return false;">
-       Open Popup Form
-    </a>
-{% endblock popup_link %}
+{% extends 'popup_forms/base.html' %}
 
+{# POPUP LINK #}
+{% block popup_link_label %}Open Popup Form{% endblock %}
 
 {# POPUP FORM #}
-{% block popup_form %}
-<div id="popup_form{{ popup_id }}" class="popup_box"
-     {% if not form.is_bound %}style="display:none"{% endif %}>
-
-    <form method="post" action="{{ action }}">
-      {% csrf_token %}
+{% block form_fields %}
       {{ form.as_p }}
-      <button type="submit" class="btn_blue">Ok</button>
-      <a class="btn_gray" href="{{ request.path }}">Cancel</a>
-    </form>
-
-</div>
-{% endblock popup_form %}
+{% endblock %}
