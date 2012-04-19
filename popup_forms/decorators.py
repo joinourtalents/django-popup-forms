@@ -15,7 +15,7 @@ def handler(func):
     of popup form.
 
     The popup handling view should return one of following objects::
-    
+
       * popup_forms.CloseFormResponse
       * popup_forms.OpenFormResponse
 

@@ -26,28 +26,28 @@
          {% block popup_link_label %}POPUP{% endblock %}
       </a>
   {% endblock popup_link %}
-  
+
   {# POPUP FORM #}
   {% block popup_form %}
   <div id="popup_form_{{ popup_id }}"
        class="{% block popup_form_class %}popup_box{% endblock %}"
        {% if form_hide %}style="display:none"{% endif %}>
     <div class="popup_container">
-  
+
       {% block form_container %}
         <h2 class="popup_header">{% block form_title %}TITLE GOES HERE{% endblock %}</h2>
         <div class="popup_content form_centered">
           {% block form_body %}
             <form{% block form_attributes %} method="post" action="{{ action }}"{% endblock form_attributes %}>
               {% csrf_token %}
-  
+
               {% block form_fields %}
                 {% for field in form %}
                   {# include 'forms/field.html' #}
                   {{ field }}
                 {% endfor %}
               {% endblock form_fields %}
-  
+
                 <div class="popup_buttons_box">
                   <div class="fl_r">
                     {% block form_buttons %}
@@ -56,12 +56,12 @@
                     {% endblock form_buttons %}
                   </div>
                 </div>
-  
+
             </form>
           {% endblock form_body %}
         </div>
       {% endblock form_container %}
-  
+
     </div>
   </div>
   {% endblock popup_form %}
