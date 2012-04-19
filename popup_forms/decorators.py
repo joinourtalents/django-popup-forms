@@ -16,12 +16,12 @@ def handler(func):
 
     The popup handling view should return one of following objects::
     
-      * popup_forms.CloseResponse
-      * popup_forms.OpenResponse
+      * popup_forms.CloseFormResponse
+      * popup_forms.OpenFormResponse
 
-    In case of returning `CloseResponse` the browser is redirected by
+    In case of returning `CloseFormResponse` the browser is redirected by
     default to the same page, without populating form. In case of returning
-    `OpenResponse` browser by default is redirected to the same page,
+    `OpenFormResponse` browser by default is redirected to the same page,
     and the form is re-populated. This decorator puts the form with
     errors to session, and redirects
     back to original view, from where form was submitted. Then
@@ -33,10 +33,10 @@ def handler(func):
     .. IMPORTANT::
         * View should not render anything (i.e. return `HttpResponse`).
         * If form validation failed, view should return
-          `OpenResponse` passing form as only argument::
+          `OpenFormResponse` passing form as only argument::
 
               if not form.is_valid():
-                  return OpenResponse(form)
+                  return OpenFormResponse(form)
 
     """
 

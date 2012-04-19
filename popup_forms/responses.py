@@ -2,7 +2,7 @@
 from django.http import HttpResponseRedirect
 
 
-class OpenResponse(HttpResponseRedirect):
+class OpenFormResponse(HttpResponseRedirect):
     """Redirects back to the referer, re-opening the popup form"""
 
     def __init__(self, request, form=None, redirect_to=None):
@@ -14,10 +14,10 @@ class OpenResponse(HttpResponseRedirect):
         if redirect_to is None:
             redirect_to = request.META.get('HTTP_REFERER', '/')
 
-        return super(OpenResponse, self).__init__(redirect_to)
+        return super(OpenFormResponse, self).__init__(redirect_to)
 
 
-class CloseResponse(HttpResponseRedirect):
+class CloseFormResponse(HttpResponseRedirect):
     """Redirects back to the referer, closing the popup form"""
 
     def __init__(self, request, redirect_to=None):
@@ -28,6 +28,6 @@ class CloseResponse(HttpResponseRedirect):
 
         if redirect_to is None:
             redirect_to = request.META.get('HTTP_REFERER', '/')
-        return super(CloseResponse, self).__init__(redirect_to)
+        return super(CloseFormResponse, self).__init__(redirect_to)
 
 

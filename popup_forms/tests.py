@@ -40,10 +40,10 @@ def process_form(request):
     if request.method == 'POST':
         form = PopupForm(request.POST)
         if not form.is_valid():
-            return popup_forms.OpenResponse(request, form)
+            return popup_forms.OpenFormResponse(request, form)
         request.session['stored_data'] = form.save()
-        return popup_forms.CloseResponse(request, reverse('success'))
-    return popup_forms.CloseResponse(request)
+        return popup_forms.CloseFormResponse(request, reverse('success'))
+    return popup_forms.CloseFormResponse(request)
 
 
 def success(request):
