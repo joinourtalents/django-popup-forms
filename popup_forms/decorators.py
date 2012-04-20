@@ -47,10 +47,8 @@ def handler(func):
         if 'popup_form' in request.session:
             del request.session['popup_form']
 
-        # Try processing form. If form contains errors,
-        # put it to session and redirect back to referrer.
+        # Process the form and redirect to the next URL
         response = func(request, *args, **kwargs)
-
         if isinstance(response, HttpResponseRedirect):
             return response
 
