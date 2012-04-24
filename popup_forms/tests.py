@@ -5,7 +5,7 @@ from unittest import skip
 from django import test, forms
 from django.conf.urls.defaults import patterns, url
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 import popup_forms
 from django.core.urlresolvers import reverse
@@ -14,10 +14,12 @@ try:
     from django.test.utils import override_settings
 except ImportError:
     from django.conf import settings
+
     def override_settings(**kwargs):
         for key, value in kwargs.iteritems():
             setattr(settings, key, value)
         return lambda fn: fn
+
 
 class PopupForm(forms.Form):
     name = forms.CharField(max_length=10)
@@ -57,7 +59,8 @@ urlpatterns = patterns('',
     url(r'^success/$', success, name='success'),
 )
 
-@override_settings(POPUP_FORMS = ('popup_forms.tests.PopupForm',))
+
+@override_settings(POPUP_FORMS=('popup_forms.tests.PopupForm',))
 class TestPopupForm(test.TestCase):
     """Unit-testing popup forms"""
 

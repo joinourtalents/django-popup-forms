@@ -100,7 +100,6 @@ class TokenVarExtractor(object):
         return ret
 
 
-
 def do_popup_form(parser, token):
     """Renders form, and link to display it.
 
@@ -228,4 +227,3 @@ class PopupFormNode(template.Node):
         context = copy(context)
         context.update(context_vars)
         return tpl.render(RequestContext(request, context))
-

@@ -7,7 +7,8 @@ class OpenFormResponse(HttpResponseRedirect):
 
     def __init__(self, request, form=None, redirect_to=None):
         if form:
-            request.session['popup_form'] = request.path, form.data, form.errors
+            request.session['popup_form'] = (request.path,
+                                             form.data, form.errors)
         else:
             request.session['popup_form'] = request.path, None, None
 
@@ -29,5 +30,3 @@ class CloseFormResponse(HttpResponseRedirect):
         if redirect_to is None:
             redirect_to = request.META.get('HTTP_REFERER', '/')
         return super(CloseFormResponse, self).__init__(redirect_to)
-
-

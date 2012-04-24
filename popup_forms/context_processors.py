@@ -3,6 +3,7 @@ from django.utils.importlib import import_module
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+
 def popup_forms(request):
     """Puts all popup forms to 'popup_forms' context variable."""
 
