@@ -33,15 +33,22 @@ The solution consists of 4 components:
 * Decorator for view function, that is processing popup form submission,
   and exception to handle form errors::
 
-      @popup_form
+      import popup_forms
+
+      @popup_forms.handler
       def form_view(request):
           if request.method == 'POST':
               form = ApplyForm(request.post)
               if not form.is_valid():
-                  raise PopupFormValidationError(form)
-              # ... process form here ...
-              redirect('success_url')
-          redirect('failure_url') or raise Http404
+                  return popup_forms.OpenFormResponse(request, form)
+              # ...
+              # ... FORM PROCESSING GOES HERE ...
+              # ...
+              return popup_forms.CloseFormResponse(request)
+          else:
+              return redirect('failure_url')
+              # or raise Http404
+              # or just popup_forms.CloseFormResponse(request)
 
 * Template to render the form, derived from popup_forms/base.html
 * (optional) context processor (popup_forms.context_processors.popup_forms),
