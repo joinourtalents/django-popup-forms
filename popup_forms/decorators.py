@@ -90,7 +90,7 @@ def show_popup_form(action, check_function=None):
 def popup_if_session_var(action, session_key):
     """Shows popup form for specified view, if the key found in session."""
     # See `popup_forms.decorators.show_popup_form` decorator for more info.
-    def _check_function(request):
+    def _check_function(request, *args, **kwargs):
         return (request.user.is_authenticated()
                 and session_key in request.GET   # for testing purposes
                 or session_key in request.session)
