@@ -27,8 +27,8 @@ The solution consists of 4 components:
 
 * Template tag, rendering popup form and link for opening it::
 
-      {% popup_form 1 popup_forms.ApplyForm '/talent/apply/6/' 'popup_forms/apply_to_pool.html' %}
-      {% popup_form 1 popup_forms.SomeModelForm '/talent/apply/6/' 'popup_forms/apply_to_pool.html' kwarg1=... kwarg2=... %}
+      {% popup_form 'id1' popup_forms.ApplyForm '/talent/apply/6/' 'popup_forms/apply_to_pool.html' %}
+      {% popup_form 'id2' popup_forms.SomeModelForm '/talent/apply/6/' 'popup_forms/apply_to_pool.html' kwarg1=... kwarg2=... %}
 
 * Decorator for view function, that is processing popup form submission,
   and exception to handle form errors::
@@ -84,11 +84,15 @@ Use case is following:
 
 * When user clicks on link, the form, already pre-loaded in template, just makes visible
 * User fills form, and submits it. POST request goes to form processing URL
-* If form is valid, it is processed, and user is redirected to success url
-* If form contains errors, it is handled by @popup_form decorator,
-  which stores form data AND ERROR DATA in session, and redirects back to referring view
+* If form is valid, it is processed, handler returns `CloseFormResponse`
+  to close the popup form, and user is redirected to success url
+  (which by default is the referrer page where popup form was rendered)
+* If form contains errors, handler returns `OpenFormResponse`,
+  it is handled by decorator, which stores form data AND ERROR DATA
+  in session, and redirects back to referring view
 * The ``{% popup_form %}`` tag then finds data, stored by decorator,
-  and re-populates form making it VISIBLE (not hidden) - user sees the same form, with errors
+  and re-populates form making it VISIBLE (not hidden) - user
+  sees the same form, with errors
 
 Conditions
 ----------
