@@ -7,7 +7,7 @@ except IOError:
 
 setup(
     name='django-popup-forms',
-    version='1.0.2',
+    version='1.0.3',
     description='Django pop-up forms framework.',
     long_description=long_description,
     author='Social TRM Ltd',

@@ -1,0 +1,4 @@
+include README.rst
+include LICENSE
+recursive-include popup_forms/static *
+recursive-include popup_forms/templates *
