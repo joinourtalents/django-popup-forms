@@ -14,8 +14,14 @@ setup(
     author_email='david@socialtrm.com',
     url='http://github.com/joinourtalents/django-popup-forms',
     keywords = "django",
-    packages=['popup_forms'],
+    packages=['popup_forms', 'popup_forms.templatetags'],
     include_package_data=True,
+    package_data={
+        'popup_forms': ['templates/popup_forms/*.html',
+                        'templates/popup_forms_test/*.html',
+                        'static/css/*.css',
+                        'static/js/*.js',]
+    },
     zip_safe=False,
     license='BSD License',
     platforms = ['any'],
